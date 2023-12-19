@@ -26,6 +26,30 @@ export default function AuthContextProvider ({ children }) {
     }
   }
 
+  const register = async (email, password) => {
+    const { data: createdUser, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // emailRedirectTo: ''
+      }
+    })
+
+    console.log({ createdUser, error })
+    if (!error) {
+      const { status } = await supabase.from('users').insert({
+        id: createdUser.user.id,
+        email: createdUser.user.email
+      })
+
+      console.log({ status })
+
+      if (status === 201) {
+        console.log('Creado mi negro')
+      }
+    }
+  }
+
   useEffect(() => {
     supabase.auth.getSession()
       .then(({ data, error }) => {
@@ -40,7 +64,8 @@ export default function AuthContextProvider ({ children }) {
     <authContext.Provider value={{
       auth,
       login,
-      logout
+      logout,
+      register
     }}>
       { loading ? 'Loading' : children }
     </authContext.Provider>

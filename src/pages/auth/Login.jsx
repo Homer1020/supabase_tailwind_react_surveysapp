@@ -13,7 +13,7 @@ export default function Login () {
 
   return (
     <Container>
-      <form className='bg-white rounded-md border shadow-md p-5 w-5/12 ml-auto mr-auto my-7' onSubmit={ handleLogin }>
+      <form className='bg-white dark:bg-slate-800 dark:text-gray-100 rounded-md border border-gray-700 shadow-md p-5 w-5/12 ml-auto mr-auto my-7' onSubmit={ handleLogin }>
         <h1 className='uppercase text-lg font-semibold mb-5'>Iniciar Sesion</h1>
 
         <div className="mb-3">

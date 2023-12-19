@@ -1,27 +1,19 @@
+import { useContext } from 'react'
 import Container from '../../components/Container'
 import Input from '../../components/Input'
-import { supabase } from '../../config/supabase'
+import { authContext } from '../../context/authContext'
 
 export default function Register () {
+  const { register } = useContext(authContext)
+
   const handleCreateUser = async e => {
     e.preventDefault()
-
-    const { data, error } = await supabase.auth.signUp({
-      email: e.target.email.value,
-      password: e.target.password.value,
-      options: {
-        // emailRedirectTo: ''
-      }
-    })
-
-    if (!error) {
-      console.log(data)
-    }
+    register(e.target.email.value, e.target.password.value)
   }
 
   return (
     <Container>
-      <form className='bg-white rounded-md border shadow-md p-5 w-5/12 ml-auto mr-auto my-7' onSubmit={ handleCreateUser }>
+      <form className='bg-white dark:bg-slate-800 dark:text-gray-100 rounded-md border border-gray-700 shadow-md p-5 w-5/12 ml-auto mr-auto my-7' onSubmit={ handleCreateUser }>
         <h1 className='uppercase text-lg font-semibold mb-5'>Nuevo Usuario</h1>
 
         <div className="mb-3">

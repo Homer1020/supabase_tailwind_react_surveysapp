@@ -6,4 +6,23 @@
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  @apply bg-gray-100;
+}
+
+@media (prefers-color-scheme: dark) {
+  #root {
+    @apply bg-gray-900;
+  }
+}
+
+.active {
+  @apply text-emerald-500 border-emerald-500 !important;
+}
+
+.survey_field_active button {
+  @apply bg-emerald-400;
+}
+
+.survey_field_active {
+  @apply text-emerald-400;
 }

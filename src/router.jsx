@@ -5,6 +5,7 @@ import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import PrivateRouter from './components/auth/PrivateRouter'
 import PublicRoute from './components/auth/PublicRoute'
+import CreateSurvey from './pages/surveys/Create'
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: 'register',
         element: <PublicRoute element={ Register } />
+      },
+      {
+        path: 'crear-encuesta',
+        element: <PrivateRouter element={ CreateSurvey } />
       }
     ]
   }
