@@ -5,11 +5,35 @@ import { authContext } from '../context/authContext'
 import Button from '../components/Button'
 import { deleteSurvey, getAllSurveys, surveyVote } from '../helpers/surveys'
 import SurveyField from '../components/SurveyField'
+import { supabase } from '../config/supabase'
 
 export default function Home () {
   const { auth } = useContext(authContext)
   const [surveys, setSurveys] = useState([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_votes'
+        },
+        () => {
+          getAllSurveys()
+            .then(({ surveys, error }) => {
+              setLoading(false)
+              if (!error) {
+                setSurveys(surveys)
+              }
+            })
+        }
+      )
+      .subscribe()
+  }, [])
 
   useEffect(() => {
     getAllSurveys()
@@ -28,17 +52,20 @@ export default function Home () {
     }
   }
 
-  const handleVote = async (id, $target) => {
-    const { ok } = await surveyVote(auth.id, id)
+  const handleVote = async (id, surveyId, $target) => {
+    const { ok, survey } = await surveyVote(auth.id, id, surveyId)
     if (ok) {
-      $target.closest('li').classList.toggle('survey_field_active')
+      setSurveys(surveys.map(s => {
+        if (s.id === surveyId) return survey || s
+        return s
+      }))
     }
   }
 
   return (
     <Container className='py-14'>
       <Title text='Encuestas Recientes' />
-      <section className="grid grid-cols-4 gap-6 items-start">
+      <section className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
         {loading
           ? (
             <h1 className='text-white'>Loading...</h1>
@@ -50,6 +77,7 @@ export default function Home () {
               </div>
               <div className='mb-3'>
                 {survey.heading}
+                <br />
               </div>
               {
                 survey.survey_fields && (
@@ -57,10 +85,13 @@ export default function Home () {
                     {
                       survey.survey_fields.map(field => (
                         <SurveyField
-                          onClick={e => { handleVote(field.id, e.target) }}
+                          onClick={e => { handleVote(field.id, survey.id, e.target) }}
                           key={field.id}
                           field={field}
                           className={ field.user_votes.some(vote => vote.user_id === auth.id) ? 'survey_field_active' : '' }
+                          totalVotesPercentage={ field.user_votes.length / survey.survey_fields.reduce((prev, curr) => {
+                            return prev + curr?.user_votes?.length || 0
+                          }, 0) }
                         />
                       ))
                     }
